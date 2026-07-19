@@ -1,13 +1,29 @@
 import React from "react";
-import { useState } from "react";
-import ResumenCard from './components/ResumenCard';
-import GastoRow from './components/GastoRow';
+import { useState, useEffect } from "react";
+import ResumenCard from "./components/ResumenCard";
+import GastosRow from "./components/GastosRow";
 
 export default function App() {
-  const [gastos, setGastos] = useState([
-    { id: 1, monto: 4.50, comercio: "Diego E Quintana C.", tipo: "Yape", hora: "20:07" },
-    { id: 2, monto: 2.00, comercio: "Luis A Alva P.", tipo: "Yape", hora: "21:28" }
-  ]);
+  // 1. Empezamos con el estado totalmente vacío, listo para la data real
+  const [gastos, setGastos] = useState([]);
+
+  // 2. Traemos los datos de Make cuando se carga la aplicación
+  useEffect(() => {
+    const obtenerGastos = async () => {
+      try {
+        // Reemplaza esto con la URL real de tu webhook o escenario de Make
+        const respuesta = await fetch("https://hook.us2.make.com/xosyk60h7l2ent6hb3akoeegyn2e8f52");
+        const datos = await respuesta.json();
+        
+        // Asumiendo que Make te devuelve un array de gastos
+        setGastos(datos);
+      } catch (error) {
+        console.error("Error obteniendo los gastos de Make:", error);
+      }
+    };
+
+    obtenerGastos();
+  }, []);
 
   const totalDelDia = gastos.reduce((sum, item) => sum + item.monto, 0);
 
@@ -24,9 +40,15 @@ export default function App() {
       </h3>
 
       <div className="rounded-xl overflow-hidden shadow-sm border border-gray-100">
-        {gastos.map((gasto) => (
-          <GastoRow key={gasto.id} gasto={gasto} />
-        ))}
+        {gastos.length === 0 ? (
+          <p className="text-center text-gray-400 py-8 bg-white text-sm">
+            Esperando notificaciones de Make...
+          </p>
+        ) : (
+          gastos.map((gasto) => (
+            <GastosRow key={gasto.id} gasto={gasto} />
+          ))
+        )}
       </div>
     </div>
   );
