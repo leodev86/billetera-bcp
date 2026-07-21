@@ -34,8 +34,15 @@ export default function App() {
   };
 
   useEffect(() => {
-    // Carga inicial
-    obtenerGastosHoy();
+    const cargarGastos = async () => {
+      try {
+        await obtenerGastosHoy();
+      } catch (error) {
+        console.error("Error en carga inicial:", error);
+      }
+    };
+
+    cargarGastos();
 
     // ⚡ TIEMPO REAL: Si Make inserta algo nuevo en Supabase, la app se actualiza sola
     const canal = supabase
