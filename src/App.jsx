@@ -40,13 +40,13 @@ export default function App() {
   return (
     <div className="max-w-[480px] mx-auto p-5 font-sans bg-gray-50 min-h-screen">
       <h2 className="text-[#002A61] mb-5 text-left font-black text-2xl tracking-tight">
-        📱 Billetera BCP v1.0
+        📱 Mi Billetera
       </h2>
 
       <ResumenCard total={totalDelDia} />
 
       <h3 className="text-sm text-gray-500 mb-2.5 pl-1 font-medium">
-        Historial de Consumos
+        Mis Consumos de Hoy
       </h3>
 
       <div className="rounded-xl overflow-hidden shadow-sm border border-gray-100">
