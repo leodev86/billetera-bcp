@@ -1,14 +1,26 @@
-import React from "react";
+export default function ResumenCard({ gastos = [] }) {
+  // Calculamos el total consumido
+  const total = gastos.reduce((acc, gasto) => acc + Number(gasto.monto || 0), 0);
 
-export default function ResumenCard({ total}) {
-    return (
-        <div className="bg-[#002A61] text-white p-5 rounded-xl mb-5 shadow-sm">
-            <p className="text-xs opacity-80 m-0 uppercase tracking-wider font-semibold">
-                Gastos Totales de Hoy
-            </p>
-            <h1 className="text-3xl font-bold mt-1.5 m-0">
-                S/ {total.toFixed(2)}
-            </h1>
-        </div>
-    );
+  return (
+    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 text-white shadow-xl mb-6">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          Resumen de Gastos
+        </span>
+        <span className="bg-slate-800 text-slate-300 text-xs px-2.5 py-1 rounded-full font-medium">
+          {gastos.length} {gastos.length === 1 ? 'movimiento' : 'movimientos'}
+        </span>
+      </div>
+
+      <div className="mt-1">
+        <p className="text-3xl font-extrabold tracking-tight text-emerald-400">
+          S/ {total.toFixed(2)}
+        </p>
+        <p className="text-xs text-slate-500 mt-1">
+          Registrados automáticamente por la IA
+        </p>
+      </div>
+    </div>
+  );
 }

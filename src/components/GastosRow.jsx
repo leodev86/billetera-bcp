@@ -1,18 +1,40 @@
-import React from "react";
+export default function GastosRow({ gasto }) {
+  const { comercio, monto, fecha, categoria } = gasto;
 
-export default function GastosRow({ gasto}) {
-    return(
-        <div className="flex justify-between items-center px-4 py-3 border-b border-gray-100 bg-white">
-            <div>
-                <span className="text-xs font-bold text-[#002A61] bg-[#E3EDFC] px-2 py-1 rounded-full mr-2.5">
-                    {gasto.tipo}
-                </span>
-                <strong className="text-gray-800">{gasto.comercio}</strong>
-                <div className="text-xs text-gray-400 mt-1">{gasto.hora}</div>
-            </div>
-            <div className="font-bold text-emerald-500 text-base">
-                - S/ {gasto.monto.toFixed(2)}
-            </div>
+  // Función para asignar un ícono según el comercio/categoría
+  const obtenerIcono = (texto = '') => {
+    const t = texto.toLowerCase();
+    if (t.includes('yape') || t.includes('transferencia')) return '📱';
+    if (t.includes('plaza vea') || t.includes('wong') || t.includes('tottus') || t.includes('metro') || t.includes('super')) return '🛒';
+    if (t.includes('starbucks') || t.includes('restaurante') || t.includes('kf') || t.includes('bembos') || t.includes('comida')) return '🍔';
+    if (t.includes('grifo') || t.includes('primax') || t.includes('uber') || t.includes('cabify') || t.includes('pasaje')) return '🚗';
+    if (t.includes('farma') || t.includes('inkafarma') || t.includes('mifarma')) return '💊';
+    return '💳'; // Ícono por defecto
+  };
+
+  const icono = obtenerIcono(`${comercio} ${categoria || ''}`);
+
+  return (
+    <div className="flex items-center justify-between p-4 bg-slate-900/60 border border-slate-800/80 rounded-2xl mb-3 hover:bg-slate-800/50 transition-colors">
+      <div className="flex items-center gap-3.5">
+        <div className="w-11 h-11 rounded-xl bg-slate-800 flex items-center justify-center text-xl shadow-inner">
+          {icono}
         </div>
-    );
+        <div>
+          <h4 className="text-sm font-semibold text-slate-100 capitalize">
+            {comercio || 'Consumo BCP'}
+          </h4>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {fecha ? new Date(fecha).toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }) : 'Hoy'}
+          </p>
+        </div>
+      </div>
+
+      <div className="text-right">
+        <span className="text-base font-bold text-slate-100">
+          - S/ {Number(monto || 0).toFixed(2)}
+        </span>
+      </div>
+    </div>
+  );
 }
