@@ -7,35 +7,52 @@ export default function App() {
   const [gastos, setGastos] = useState([]);
   const [cargando, setCargando] = useState(true);
 
+  const obtenerGastosHoy = async () => {
+    try {
+      // 1. Obtenemos el inicio del día local en formato YYYY-MM-DD
+      const hoy = new Date();
+      const año = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+      const dia = String(hoy.getDate()).padStart(2, "0");
+      const inicioDelDiaLocal = `${año}-${mes}-${dia}T00:00:00`;
+
+      // 2. Consultamos a Supabase
+      const { data, error } = await supabase
+        .from("gastos")
+        .select("*")
+        .gte("fecha", inicioDelDiaLocal)
+        .order("fecha", { ascending: false });
+
+      if (error) throw error;
+
+      setGastos(data || []);
+    } catch (error) {
+      console.error("Error consultando Supabase:", error.message);
+    } finally {
+      setCargando(false);
+    }
+  };
+
   useEffect(() => {
-    const obtenerGastosHoy = async () => {
-      try {
-        const inicioDelDia = new Date();
-        inicioDelDia.setHours(0, 0, 0, 0);
-
-        const { data, error } = await supabase
-          .from("gastos")
-          .select("*")
-          .gte("fecha", inicioDelDia.toISOString())
-          .order("fecha", { ascending: false});
-
-          if (error) throw error;
-
-          setGastos(data || []);
-      }   catch (error) {
-        console.error("Error consultando Supabase:", error.message);
-      } finally {
-        setCargando(false);
-      }
-    };
-
+    // Carga inicial
     obtenerGastosHoy();
-  }, []);
 
-  const totalDelDia = gastos.reduce(
-    (sum, item) => sum + Number(item.monto || 0),
-    0
-  );
+    // ⚡ TIEMPO REAL: Si Make inserta algo nuevo en Supabase, la app se actualiza sola
+    const canal = supabase
+      .channel("cambios-gastos")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "gastos" },
+        () => {
+          obtenerGastosHoy(); // Vuelve a cargar si hay registros nuevos
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(canal);
+    };
+  }, []);
 
   return (
     <div className="max-w-[480px] mx-auto p-5 font-sans bg-gray-50 min-h-screen">
@@ -43,7 +60,7 @@ export default function App() {
         📱 Mi Billetera
       </h2>
 
-      <ResumenCard total={totalDelDia} />
+      <ResumenCard gastos={gastos} />
 
       <h3 className="text-sm text-gray-500 mb-2.5 pl-1 font-medium">
         Mis Consumos de Hoy
@@ -67,4 +84,3 @@ export default function App() {
     </div>
   );
 }
-
