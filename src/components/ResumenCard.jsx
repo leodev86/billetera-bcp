@@ -18,7 +18,7 @@ export default function ResumenCard({ gastos = [] }) {
           S/ {total.toFixed(2)}
         </p>
         <p className="text-xs text-slate-500 mt-1">
-          Registrados automáticamente por la IA
+          Registrados automáticamente
         </p>
       </div>
     </div>
