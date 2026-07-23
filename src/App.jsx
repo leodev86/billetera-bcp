@@ -3,6 +3,8 @@ import { supabase } from "./supabaseClient";
 import ResumenCard from "./components/ResumenCard";
 import GastosRow from "./components/GastosRow";
 
+const sonidoNotificacion = new Audio("/sounds/notificacion.mp3")
+
 export default function App() {
   const [gastos, setGastos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -51,6 +53,10 @@ export default function App() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "gastos" },
         () => {
+
+          sonidoNotificacion.play().catch((e) =>{
+            console.log("El navegador bloqueo la reproduccion automatica de audio:", e);
+          })
           obtenerGastosHoy(); // Vuelve a cargar si hay registros nuevos
         }
       )
